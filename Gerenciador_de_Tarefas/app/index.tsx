@@ -3,6 +3,7 @@ import {
   Alert,
   FlatList,
   Modal,
+  Platform,
   Text,
   TextInput,
   TouchableOpacity,
@@ -144,8 +145,19 @@ export default function Home() {
   }
 
   function deletarTodasTarefas() {
+    if (Platform.OS === "web") {
+      const confirmar = window.confirm("Deseja remover todas as tarefas?");
+      if (confirmar) {
+        setTarefas([]);
+      }
+      return;
+    }
+
     Alert.alert("Limpar tudo", "Deseja remover todas as tarefas?", [
-      { text: "Cancelar", style: "cancel" },
+      {
+        text: "Cancelar",
+        style: "cancel",
+      },
       {
         text: "Sim",
         style: "destructive",
