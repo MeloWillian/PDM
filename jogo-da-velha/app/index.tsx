@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import {
   Alert,
   StyleSheet,
@@ -34,19 +34,19 @@ export default function Index() {
 
   function atualizarPlacar(resultado: Resultado) {
     if (resultado === jogo.getJogadorHumano().getSimbolo()) {
-      setPlacarJogador((valor) => valor + 1);
+      setPlacarJogador((valorAtual) => valorAtual + 1);
       Alert.alert("Fim de jogo", "Você venceu!");
       return;
     }
 
     if (resultado === jogo.getJogadorCPU().getSimbolo()) {
-      setPlacarCpu((valor) => valor + 1);
-      Alert.alert("Fim de jogo", "Computador venceu!");
+      setPlacarCpu((valorAtual) => valorAtual + 1);
+      Alert.alert("Fim de jogo", "A máquina venceu!");
       return;
     }
 
     if (resultado === "EMPATE") {
-      setPlacarEmpates((valor) => valor + 1);
+      setPlacarEmpates((valorAtual) => valorAtual + 1);
       Alert.alert("Fim de jogo", "Deu velha!");
     }
   }
@@ -57,14 +57,6 @@ export default function Index() {
 
     if (resultadoHumano) {
       atualizarPlacar(resultadoHumano);
-      return;
-    }
-
-    const resultadoCpu = jogo.jogarCPU();
-    atualizarTela();
-
-    if (resultadoCpu) {
-      atualizarPlacar(resultadoCpu);
     }
   }
 
@@ -80,6 +72,23 @@ export default function Index() {
     setPlacarEmpates(0);
     atualizarTela();
   }
+
+  useEffect(() => {
+    if (!jogo.ehVezDaCPU() || jogo.acabou()) {
+      return;
+    }
+
+    const timer = setTimeout(() => {
+      const resultadoCpu = jogo.jogarCPU();
+      atualizarTela();
+
+      if (resultadoCpu) {
+        atualizarPlacar(resultadoCpu);
+      }
+    }, 400);
+
+    return () => clearTimeout(timer);
+  }, [tabuleiro]);
 
   const linhas = useMemo(() => {
     return [
@@ -106,7 +115,7 @@ export default function Index() {
         </View>
 
         <View style={styles.cardPlacar}>
-          <Text style={styles.rotuloPlacar}>CPU</Text>
+          <Text style={styles.rotuloPlacar}>Máquina</Text>
           <Text style={styles.valorPlacar}>{placarCpu}</Text>
         </View>
       </View>
@@ -134,10 +143,21 @@ export default function Index() {
                   ]}
                   onPress={() => jogar(index)}
                   activeOpacity={0.8}
-                  disabled={jogo.acabou()}
+                  disabled={jogo.acabou() || !jogo.ehVezDoHumano()}
                 >
                   <Text
-                    style={[styles.textoCasa, { fontSize: tamanhoCasa * 0.45 }]}
+                    style={[
+                      styles.textoCasa,
+                      {
+                        fontSize: tamanhoCasa * 0.45,
+                        color:
+                          valor === "X"
+                            ? "#007bff"
+                            : valor === "O"
+                              ? "#dc3545"
+                              : "#111",
+                      },
+                    ]}
                   >
                     {valor}
                   </Text>

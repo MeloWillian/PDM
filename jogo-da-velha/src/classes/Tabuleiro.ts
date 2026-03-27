@@ -28,6 +28,10 @@ export class Tabuleiro {
     return true;
   }
 
+  desfazerJogada(posicao: number) {
+    this.casas[posicao] = null;
+  }
+
   getJogadasDisponiveis() {
     return this.casas
       .map((valor, indice) => (valor === null ? indice : -1))
@@ -61,5 +65,17 @@ export class Tabuleiro {
 
   verificarEmpate() {
     return this.casas.every((casa) => casa !== null);
+  }
+
+  clonar() {
+    const novoTabuleiro = new Tabuleiro();
+
+    this.casas.forEach((valor, indice) => {
+      if (valor !== null) {
+        novoTabuleiro.fazerJogada(indice, valor);
+      }
+    });
+
+    return novoTabuleiro;
   }
 }

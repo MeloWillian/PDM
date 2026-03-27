@@ -14,7 +14,7 @@ export class JogoDaVelha {
   constructor() {
     this.tabuleiro = new Tabuleiro();
     this.jogadorHumano = new Jogador("Você", "X");
-    this.jogadorCPU = new JogadorCPU("CPU", "O");
+    this.jogadorCPU = new JogadorCPU("Máquina", "O");
     this.jogadorDaVez = this.jogadorHumano;
     this.finalizado = false;
     this.ultimoResultado = null;
@@ -40,6 +40,14 @@ export class JogoDaVelha {
     return this.finalizado;
   }
 
+  ehVezDoHumano() {
+    return this.jogadorDaVez === this.jogadorHumano;
+  }
+
+  ehVezDaCPU() {
+    return this.jogadorDaVez === this.jogadorCPU;
+  }
+
   reiniciar() {
     this.tabuleiro.limpar();
     this.jogadorDaVez = this.jogadorHumano;
@@ -54,7 +62,7 @@ export class JogoDaVelha {
       }
 
       if (this.ultimoResultado === this.jogadorCPU.getSimbolo()) {
-        return "Computador venceu";
+        return "A máquina venceu";
       }
 
       if (this.ultimoResultado === "EMPATE") {
@@ -62,13 +70,11 @@ export class JogoDaVelha {
       }
     }
 
-    return this.jogadorDaVez === this.jogadorHumano
-      ? "Sua vez"
-      : "Vez do computador";
+    return this.ehVezDoHumano() ? "Sua vez" : "Vez da máquina";
   }
 
   jogarHumano(posicao: number) {
-    if (this.finalizado || this.jogadorDaVez !== this.jogadorHumano) {
+    if (this.finalizado || !this.ehVezDoHumano()) {
       return null;
     }
 
@@ -92,11 +98,14 @@ export class JogoDaVelha {
   }
 
   jogarCPU() {
-    if (this.finalizado || this.jogadorDaVez !== this.jogadorCPU) {
+    if (this.finalizado || !this.ehVezDaCPU()) {
       return null;
     }
 
-    const posicao = this.jogadorCPU.escolherJogada(this.tabuleiro);
+    const posicao = this.jogadorCPU.escolherJogada(
+      this.tabuleiro,
+      this.jogadorHumano.getSimbolo(),
+    );
 
     if (posicao === -1) {
       return null;
