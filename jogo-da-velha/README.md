@@ -1,50 +1,87 @@
-# Welcome to your Expo app 👋
+# 🎮 Jogo da Velha - React Native (PDM 2026)
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+Implementação de um Jogo da Velha desenvolvido em React Native, seguindo uma abordagem incremental por etapas, com foco em modelagem orientada a objetos e integração com interface gráfica.
 
-## Get started
+---
 
-1. Install dependencies
+## 📌 Sobre o Projeto
 
-   ```bash
-   npm install
-   ```
+Este projeto foi desenvolvido como atividade prática da disciplina de
+Programação para Dispositivos Móveis (PDM).
 
-2. Start the app
+O objetivo principal é construir um jogo da velha evoluindo sua
+complexidade ao longo de etapas, aplicando conceitos como:
 
-   ```bash
-   npx expo start
-   ```
+- Interface gráfica responsiva
+- Programação orientada a objetos (OO)
+- Separação de responsabilidades
+- Integração entre lógica de negócio e UI
+- Inteligência artificial (minimax)
 
-In the output, you'll find options to open the app in a
+---
 
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
+## 🧱 Estrutura do Projeto
 
-You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
+    Jogo_da_Velha/
+    ├── app/
+    │   └── index.tsx
+    ├── src/
+    │   ├── classes/
+    │   │   ├── Jogador.ts
+    │   │   ├── JogadorCPU.ts
+    │   │   ├── Tabuleiro.ts
+    │   │   └── JogoDaVelha.ts
+    │   └── types/
+    │       └── jogo.ts
 
-## Get a fresh project
+---
 
-When you're ready, run:
+## 🚀 Etapas do Desenvolvimento
 
-```bash
-npm run reset-project
-```
+### 🟢 Etapa 1 - Interface com o Usuário
 
-This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
+- Criação da interface do jogo
+- Uso de useWindowDimensions para responsividade
+- Exibição do tabuleiro
+- Exibição do placar
 
-## Learn more
+---
 
-To learn more about developing your project with Expo, look at the following resources:
+### 🟡 Etapa 2 - Modelagem Orientada a Objetos
 
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
+- Implementação da lógica do jogo utilizando OO
+- Criação das classes principais
+- Separação da lógica da interface
+- CPU simples
 
-## Join the community
+---
 
-Join our community of developers creating universal apps.
+### 🔵 Etapa 3 - Integração OO + Interface Gráfica
 
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+- Integração completa entre UI e classes
+- Jogada automática da CPU
+- Implementação de IA com Minimax
+- Controle de vitória e empate
+- Atualização do placar
+
+---
+
+## 🧠 Arquitetura
+
+- UI (index.tsx): interface e interação
+- JogoDaVelha: controle do jogo
+- Tabuleiro: estado do tabuleiro
+- Jogador / JogadorCPU: jogadores
+
+---
+
+## ▶️ Como Executar
+
+    npm install
+    npx expo start
+
+---
+
+## 👨‍💻 Autor
+
+Willian de Melo Araújo
