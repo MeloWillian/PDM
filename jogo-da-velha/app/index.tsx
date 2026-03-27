@@ -1,5 +1,6 @@
 import { useMemo, useState } from "react";
 import {
+  Alert,
   StyleSheet,
   Text,
   TouchableOpacity,
@@ -7,9 +8,9 @@ import {
   useWindowDimensions,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { JogoDaVelha } from "../src/classes/JogoDaVelha";
+import type { Casa, Resultado } from "../src/types/jogo";
 
-const JOGADOR = "X";
-const MAQUINA = "O";
 const TAMANHO = 3;
 const BORDA = 2;
 
@@ -19,28 +20,65 @@ export default function Index() {
   const tamanhoTabuleiro = Math.min(width - 32, 330);
   const tamanhoCasa = (tamanhoTabuleiro - BORDA * 2) / TAMANHO;
 
-  const [tabuleiro, setTabuleiro] = useState<(string | null)[]>(
-    Array(9).fill(null),
-  );
-  const [vez, setVez] = useState<"X" | "O">("X");
+  const [jogo] = useState(() => new JogoDaVelha());
+  const [tabuleiro, setTabuleiro] = useState<Casa[]>(jogo.getTabuleiro());
+  const [mensagem, setMensagem] = useState(jogo.getMensagemStatus());
+  const [placarJogador, setPlacarJogador] = useState(0);
+  const [placarCpu, setPlacarCpu] = useState(0);
+  const [placarEmpates, setPlacarEmpates] = useState(0);
 
-  const [placarJogador] = useState(0);
-  const [placarMaquina] = useState(0);
-  const [placarEmpates] = useState(0);
-
-  function jogadaHumana(posicao: number) {
-    if (tabuleiro[posicao]) return;
-
-    const novoTabuleiro = [...tabuleiro];
-    novoTabuleiro[posicao] = vez;
-    setTabuleiro(novoTabuleiro);
-
-    setVez(vez === JOGADOR ? MAQUINA : JOGADOR);
+  function atualizarTela() {
+    setTabuleiro(jogo.getTabuleiro());
+    setMensagem(jogo.getMensagemStatus());
   }
 
-  function reiniciarJogo() {
-    setTabuleiro(Array(9).fill(null));
-    setVez(JOGADOR);
+  function atualizarPlacar(resultado: Resultado) {
+    if (resultado === jogo.getJogadorHumano().getSimbolo()) {
+      setPlacarJogador((valor) => valor + 1);
+      Alert.alert("Fim de jogo", "Você venceu!");
+      return;
+    }
+
+    if (resultado === jogo.getJogadorCPU().getSimbolo()) {
+      setPlacarCpu((valor) => valor + 1);
+      Alert.alert("Fim de jogo", "Computador venceu!");
+      return;
+    }
+
+    if (resultado === "EMPATE") {
+      setPlacarEmpates((valor) => valor + 1);
+      Alert.alert("Fim de jogo", "Deu velha!");
+    }
+  }
+
+  function jogar(posicao: number) {
+    const resultadoHumano = jogo.jogarHumano(posicao);
+    atualizarTela();
+
+    if (resultadoHumano) {
+      atualizarPlacar(resultadoHumano);
+      return;
+    }
+
+    const resultadoCpu = jogo.jogarCPU();
+    atualizarTela();
+
+    if (resultadoCpu) {
+      atualizarPlacar(resultadoCpu);
+    }
+  }
+
+  function novaPartida() {
+    jogo.reiniciar();
+    atualizarTela();
+  }
+
+  function zerarPlacar() {
+    jogo.reiniciar();
+    setPlacarJogador(0);
+    setPlacarCpu(0);
+    setPlacarEmpates(0);
+    atualizarTela();
   }
 
   const linhas = useMemo(() => {
@@ -54,9 +92,7 @@ export default function Index() {
   return (
     <SafeAreaView style={styles.container}>
       <Text style={styles.titulo}>Jogo da Velha</Text>
-      <Text style={styles.subtitulo}>
-        Vez: {vez === JOGADOR ? "Você" : "Computador"}
-      </Text>
+      <Text style={styles.subtitulo}>{mensagem}</Text>
 
       <View style={styles.placar}>
         <View style={styles.cardPlacar}>
@@ -70,8 +106,8 @@ export default function Index() {
         </View>
 
         <View style={styles.cardPlacar}>
-          <Text style={styles.rotuloPlacar}>Máquina</Text>
-          <Text style={styles.valorPlacar}>{placarMaquina}</Text>
+          <Text style={styles.rotuloPlacar}>CPU</Text>
+          <Text style={styles.valorPlacar}>{placarCpu}</Text>
         </View>
       </View>
 
@@ -96,8 +132,9 @@ export default function Index() {
                       height: tamanhoCasa,
                     },
                   ]}
-                  onPress={() => jogadaHumana(index)}
+                  onPress={() => jogar(index)}
                   activeOpacity={0.8}
+                  disabled={jogo.acabou()}
                 >
                   <Text
                     style={[styles.textoCasa, { fontSize: tamanhoCasa * 0.45 }]}
@@ -113,10 +150,18 @@ export default function Index() {
 
       <TouchableOpacity
         style={styles.botao}
-        onPress={reiniciarJogo}
+        onPress={novaPartida}
         activeOpacity={0.8}
       >
         <Text style={styles.textoBotao}>Nova partida</Text>
+      </TouchableOpacity>
+
+      <TouchableOpacity
+        style={styles.botaoSecundario}
+        onPress={zerarPlacar}
+        activeOpacity={0.8}
+      >
+        <Text style={styles.textoBotaoSecundario}>Zerar placar</Text>
       </TouchableOpacity>
     </SafeAreaView>
   );
@@ -195,6 +240,18 @@ const styles = StyleSheet.create({
   },
   textoBotao: {
     color: "#fff",
+    fontSize: 14,
+    fontWeight: "700",
+  },
+  botaoSecundario: {
+    marginTop: 12,
+    backgroundColor: "#d9d9d9",
+    paddingVertical: 12,
+    paddingHorizontal: 20,
+    borderRadius: 8,
+  },
+  textoBotaoSecundario: {
+    color: "#111",
     fontSize: 14,
     fontWeight: "700",
   },
